@@ -1,0 +1,32 @@
+
+
+
+(1)
+Create new 3d project
+
+(2)
+Import new input system
+    go to menu "Window -> Package Manager"
+	in the "Packages" dropdown, select "Unity Registry"
+	scroll down to "Input System", and install it
+    
+(3)
+Enable the new input system
+    go to menu: Edit->Project settings->Player
+    find setting: Configuration->Active Input Handling
+    set to "Input System Package (New)"
+	
+(4) 
+Import the "FPS_BASIC" package
+    go to menu "Assets -> Import Package"
+    select the "FPSBasic.unitypackage" file and import it
+   
+(5)
+Test the FPSBasic package
+    create a player object, eg a capsule.
+    add the "PlayerController" script to the player object.
+
+
+
+	
+	
