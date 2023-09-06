@@ -17,11 +17,17 @@ public class PlayerController : MonoBehaviour
     private float cameraOffsetY = 0.25f;
     private float cameraOffsetZ = 0.0f;
 
-    [Header("Player speed")]
+    [Header("Player attributes")]
+    public Vector3 groundCheckBoxSize = new Vector3(1.0f ,1.0f, 1.0f);
+    public float groundCheckMaxBoxDistance = 1;
+    public LayerMask groundLayerMask;
     public float walkSpeed = 5.0f;
     public float sprintSpeed = 12.0f;
     public bool isWalkingSpeed = true;
+    public float jumpForce = 5.0f;
+    
     private float currentPlayerSpeed;
+    private Rigidbody playerRigidBody;
 
     [Header("Mouse Settings")]
     public float mouseSensitivityX = 10.0f;
@@ -29,12 +35,14 @@ public class PlayerController : MonoBehaviour
     public bool cursorLocked = true;
     public bool cursorInputForLook = true;
 
+
     private void Awake()
     {
         playerInputActions = new PlayerInput();
         onFootActions = playerInputActions.OnFoot;
 
         onFootActions.Fire.performed += ctx => Fire();
+        onFootActions.Jump.performed += ctx => Jump();
         onFootActions.Sprint.performed += ctx => SprintToggle();
 
         // If no camera specified, use the first "main camera" found
@@ -71,6 +79,9 @@ public class PlayerController : MonoBehaviour
 
         SetCameraPosition();
         SetPlayerSpeed();
+
+        // Initialise some player attributes
+        playerRigidBody = GetComponent<Rigidbody>();
 
         // Initialise camera rotation so it matches the player rotation
         var playerRotation = transform.rotation;
@@ -119,18 +130,46 @@ public class PlayerController : MonoBehaviour
         // Rotate player to look left or right (so the player and the camera are turned in the same direction)
         transform.Rotate(Vector3.up * yRotateAmount);
     }
-   
+
     private void Fire()
     {
         Debug.Log("Fire");
     }
-    
+
+    private void Jump()
+    {
+        Debug.Log("Jump");
+
+        // Only allow jump if on the ground
+        if (GroundCheck())
+        {
+            playerRigidBody.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+        }
+    }
+
     private void SprintToggle()
     {
         Debug.Log("Sprint (toggle)");
 
         isWalkingSpeed = !isWalkingSpeed;
         SetPlayerSpeed();
+    }
+
+    /// <summary>
+    /// Indicates whether or not the player is on the "Ground".
+    /// </summary>
+    private bool GroundCheck()
+    {
+        var centre = transform.position;
+        var direction = -transform.up;
+        var rotation = transform.rotation;
+
+        if (Physics.BoxCast(centre, groundCheckBoxSize, direction, rotation, groundCheckMaxBoxDistance, groundLayerMask))
+        {
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -148,5 +187,19 @@ public class PlayerController : MonoBehaviour
     private void SetPlayerSpeed()
     {
         currentPlayerSpeed = isWalkingSpeed ? walkSpeed : sprintSpeed;
+    }
+
+    /// <summary>
+    /// Debug.
+    /// </summary>
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+
+        // Draw box at maximum distance from centre of player
+        var direction = -transform.up;
+        var centreForDrawCube = transform.position + (direction * groundCheckMaxBoxDistance);
+
+        Gizmos.DrawCube(centreForDrawCube, groundCheckBoxSize);
     }
 }

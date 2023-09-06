@@ -23,8 +23,18 @@ Import the "FPS_BASIC" package
    
 (5)
 Test the FPSBasic package
+	create a terrain, give it a layer called "Ground".
     create a player object, eg a capsule.
+	add a RigidBody to the player
+	set constraints on the RigidBody: freeze rotation x,y,z (so the capsule doesn't tip over)
     add the "PlayerController" script to the player object.
+	set reasonable values for the properties in Unity.
+		ground check box size = 1, 0.2, 1
+		ground check max box distance = 1
+		gound layer mask = Ground
+		walk speed = 5
+		sprint speed = 12
+		jump foce = 5
 
 
 
